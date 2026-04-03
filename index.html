@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magnum Market</title>
+
+<style>
+body {margin:0;font-family:Arial;background:#f5f5f5;}
+
+header {
+    background:#e60023;
+    color:white;
+    padding:12px;
+    text-align:center;
+}
+
+.search {
+    width:90%;
+    margin:10px auto;
+    display:block;
+    padding:8px;
+    border-radius:8px;
+    border:none;
+}
+
+.categories {
+    display:flex;
+    overflow-x:auto;
+    padding:10px;
+    background:white;
+}
+.cat {
+    margin-right:10px;
+    padding:8px 12px;
+    background:#eee;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.products {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    padding:10px;
+}
+
+.product {
+    background:white;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.product img {
+    width:100%;
+    height:100px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+button {
+    background:#e60023;
+    color:white;
+    border:none;
+    padding:8px;
+    border-radius:6px;
+    margin-top:5px;
+}
+
+.cart {
+    position:fixed;
+    right:10px;
+    top:80px;
+    width:220px;
+    background:white;
+    padding:10px;
+    border-radius:10px;
+}
+
+.modal {
+    display:none;
+    position:fixed;
+    top:20%;
+    left:10%;
+    width:80%;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<header>MAGNUM MARKET</header>
+
+<input class="search" placeholder="Іздеу..." oninput="search(this.value)">
+
+<div class="categories">
+<div class="cat" onclick="filter('all')">Барлығы</div>
+<div class="cat" onclick="filter('fruit')">Жемістер</div>
+<div class="cat" onclick="filter('milk')">Сүт</div>
+<div class="cat" onclick="filter('bread')">Нан</div>
+<div class="cat" onclick="filter('sweet')">Тәттілер</div>
+</div>
+
+<div class="products" id="products"></div>
+
+<div class="cart">
+<h4>Себет</h4>
+<ul id="cart"></ul>
+<p>Жалпы: <span id="total">0</span> тг</p>
+<button onclick="checkout()">Төлеу</button>
+</div>
+
+<div class="modal" id="pay">
+<h3>Kaspi арқылы төлеу</h3>
+<p>QR кодты сканерле</p>
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=kaspi.kz/pay" />
+<br><br>
+<button onclick="finish()">Төлем жасалды</button>
+</div>
+
+<script>
+let data = [
+{name:'Алма',price:600,cat:'fruit',img:'https://via.placeholder.com/150'},
+{name:'Банан',price:700,cat:'fruit',img:'https://via.placeholder.com/150'},
+{name:'Сүт',price:400,cat:'milk',img:'https://via.placeholder.com/150'},
+{name:'Айран',price:350,cat:'milk',img:'https://via.placeholder.com/150'},
+{name:'Нан',price:200,cat:'bread',img:'https://via.placeholder.com/150'},
+{name:'Батон',price:250,cat:'bread',img:'https://via.placeholder.com/150'},
+{name:'Шоколад',price:800,cat:'sweet',img:'https://via.placeholder.com/150'},
+{name:'Кәмпит',price:900,cat:'sweet',img:'https://via.placeholder.com/150'}
+];
+
+let cart = [];
+let total = 0;
+
+function render(list){
+let html='';
+list.forEach(p=>{
+html+=`<div class="product">
+<img src="${p.img}">
+<h4>${p.name}</h4>
+<p>${p.price} тг</p>
+<button onclick="add('${p.name}',${p.price})">Қосу</button>
+</div>`;
+});
+document.getElementById('products').innerHTML=html;
+}
+
+function add(name,price){
+cart.push({name,price});
+total+=price;
+update();
+}
+
+function update(){
+let html='';
+cart.forEach((i,index)=>{
+html+=<li>${i.name} ${i.price} <button onclick="remove(${index})">x</button></li>;
+});
+document.getElementById('cart').innerHTML=html;
+document.getElementById('total').innerText=total;
+}
+
+function remove(i){
+total-=cart[i].price;
+cart.splice(i,1);
+update();
+}
+
+function filter(cat){
+if(cat==='all'){render(data);return;}
+render(data.filter(p=>p.cat===cat));
+}
+
+function search(text){
+render(data.filter(p=>p.name.toLowerCase().includes(text.toLowerCase())));
+}
+
+function checkout(){
+document.getElementById('pay').style.display='block';
+}
+
+function finish(){
+alert('Төлем қабылданды');
+cart=[];
+total=0;
+update();
+document.getElementById('pay').style.display='none';
+}
+
+render(data);
+</script>
+
+</body>
+</html>
